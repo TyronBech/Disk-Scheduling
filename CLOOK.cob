@@ -45,7 +45,6 @@
            ELSE
              PERFORM LOHI
            END-IF.
-
            STOP RUN.
        HILO.
            PERFORM VARYING I FROM WS-START-IDX BY -1 UNTIL I < 2
@@ -57,9 +56,6 @@
            END-PERFORM.
            MOVE WS-PROCESSES(WS-NO-PROC) TO WS-P1S.
            MOVE WS-PROCESSES(1) TO WS-P2S.
-      *    COMPUTE WS-HEAD-M = WS-P1S - WS-P2S.
-      *    DISPLAY "ALPHA: " WS-HEAD-M
-      *    COMPUTE WS-THM = WS-THM + WS-HEAD-M
            PERFORM VARYING I FROM WS-NO-PROC BY -1 UNTIL I <=
            WS-START-IDX + 1
                MOVE WS-PROCESSES(I) TO WS-P1S
@@ -81,9 +77,6 @@
            END-PERFORM.
            MOVE WS-PROCESSES(WS-NO-PROC) TO WS-P1S.
            MOVE WS-PROCESSES(1) TO WS-P2S.
-      *    COMPUTE WS-HEAD-M = WS-P1S - WS-P2S.
-      *    DISPLAY "HEAD MOVEMENT: " WS-HEAD-M
-      *    COMPUTE WS-THM = WS-THM + WS-HEAD-M
            PERFORM VARYING I FROM 1 BY 1 UNTIL I >=
            WS-START-IDX - 1
                MOVE WS-PROCESSES(I  + 1) TO WS-P1S

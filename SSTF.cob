@@ -53,7 +53,6 @@
            MOVE WS-START TO WS-SEQUENCE(K).
            ADD 1 TO K.
            PERFORM SORT-SEQUENCE WS-NO-PROC TIMES.
-      *    PERFORM DISP.
            PERFORM SEQ-COMPUTE.
            STOP RUN.
        BUBBLE-SORT.
@@ -138,11 +137,6 @@
              END-IF
            END-IF.
            ADD 1 TO K.
-           EXIT.
-       DISP.
-           PERFORM VARYING I FROM 1 BY 1 UNTIL I > K
-             DISPLAY "ARR AT: " I " IS " WS-SEQUENCE(I)
-           END-PERFORM.
            EXIT.
        SEQ-COMPUTE.
            PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-NO-PROC - 1

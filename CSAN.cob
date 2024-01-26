@@ -111,11 +111,6 @@
              END-PERFORM
            END-PERFORM.
            EXIT.
-       DISP.
-           PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-NO-PROC
-             DISPLAY "ARR AT: " I " IS " WS-PROCESSES(I)
-           END-PERFORM.
-           EXIT.
        FIND-START.
            PERFORM VARYING I FROM 1 BY 1 UNTIL I >= WS-NO-PROC
              IF WS-PROCESSES(I) IS EQUAL TO WS-START
