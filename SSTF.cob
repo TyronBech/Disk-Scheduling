@@ -73,70 +73,46 @@
                MOVE WS-PROCESSES(WS-START-IDX - 1) TO WS-MIN
                MOVE WS-PROCESSES(WS-START-IDX + 1) TO WS-MAX
                MOVE WS-PROCESSES(WS-START-IDX) TO WS-CUR
-               DISPLAY "K2 APPEAR"
              END-IF
              COMPUTE I = WS-CUR - WS-MIN
              COMPUTE J = WS-MAX - WS-CUR
-             DISPLAY "I: " I
-             DISPLAY "J: " J
-             DISPLAY "WS-CUR: " WS-CUR
-             DISPLAY "WS-MIN: " WS-MIN
-             DISPLAY "WS-MAX: " WS-MAX
              IF WS-MAX = 0 THEN
-               DISPLAY "MIN WINS"
-               MOVE WS-MIN TO WS-SEQUENCE(K)
-               MOVE WS-MIN TO WS-CURRENT
-               MOVE WS-MIN TO WS-START
-               PERFORM FIND-CURRENT
-               MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR
-               PERFORM FIND-START
-               IF WS-CURRENT-IDX > 1 THEN
-                 MOVE WS-PROCESSES(WS-START-IDX - 1) TO WS-MIN
-               ELSE
-                 MOVE 0 TO WS-MIN
-               END-IF
+               PERFORM MOVE-MIN
              ELSE IF WS-MIN = 0 THEN
-               DISPLAY "MAX WINS"
-               MOVE WS-MAX TO WS-SEQUENCE(K)
-               MOVE WS-MAX TO WS-CURRENT
-               MOVE WS-MAX TO WS-START
-               PERFORM FIND-CURRENT
-               MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR
-               PERFORM FIND-START
-               IF WS-CURRENT-IDX < WS-NO-PROC THEN
-                 MOVE WS-PROCESSES(WS-START-IDX + 1) TO WS-MAX
-               ELSE
-                 MOVE 0 TO WS-MAX
-               END-IF
+               PERFORM MOVE-MAX
              ELSE IF I <= J THEN
-               DISPLAY "MIN WINS"
-               MOVE WS-MIN TO WS-SEQUENCE(K)
-               MOVE WS-MIN TO WS-CURRENT
-               MOVE WS-MIN TO WS-START
-               PERFORM FIND-CURRENT
-               MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR
-               PERFORM FIND-START
-               IF WS-CURRENT-IDX > 1 THEN
-                 MOVE WS-PROCESSES(WS-START-IDX - 1) TO WS-MIN
-               ELSE
-                 MOVE 0 TO WS-MIN
-               END-IF
-             ELSE IF J < I THEN
-               DISPLAY "MAX WINS"
-               MOVE WS-MAX TO WS-SEQUENCE(K)
-               MOVE WS-MAX TO WS-CURRENT
-               MOVE WS-MAX TO WS-START
-               PERFORM FIND-CURRENT
-               MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR
-               PERFORM FIND-START
-               IF WS-CURRENT-IDX < WS-NO-PROC THEN
-                 MOVE WS-PROCESSES(WS-START-IDX + 1) TO WS-MAX
-               ELSE
-                 MOVE 0 TO WS-MAX
-               END-IF
+               PERFORM MOVE-MIN
+             ELSE IF WS-MIN = 0 OR J < I THEN
+               PERFORM MOVE-MAX
              END-IF
            END-IF.
            ADD 1 TO K.
+           EXIT.
+       MOVE-MIN.
+           MOVE WS-MIN TO WS-SEQUENCE(K).
+           MOVE WS-MIN TO WS-CURRENT.
+           MOVE WS-MIN TO WS-START.
+           PERFORM FIND-CURRENT.
+           MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR.
+           PERFORM FIND-START.
+           IF WS-CURRENT-IDX > 1 THEN
+             MOVE WS-PROCESSES(WS-START-IDX - 1) TO WS-MIN
+           ELSE
+             MOVE 0 TO WS-MIN
+           END-IF.
+           EXIT.
+       MOVE-MAX.
+           MOVE WS-MAX TO WS-SEQUENCE(K).
+           MOVE WS-MAX TO WS-CURRENT.
+           MOVE WS-MAX TO WS-START.
+           PERFORM FIND-CURRENT.
+           MOVE WS-PROCESSES(WS-CURRENT-IDX) TO WS-CUR.
+           PERFORM FIND-START.
+           IF WS-CURRENT-IDX < WS-NO-PROC THEN
+             MOVE WS-PROCESSES(WS-START-IDX + 1) TO WS-MAX
+           ELSE
+             MOVE 0 TO WS-MAX
+           END-IF.
            EXIT.
        SEQ-COMPUTE.
            PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-NO-PROC - 1
