@@ -19,7 +19,7 @@
        01 WS-HEAD-M PIC 9(4) VALUE ZEROES.
        01 WS-P1S PIC 9(3) VALUE ZEROES.
        01 WS-P2S PIC 9(3) VALUE ZEROES.
-       01 WS-CYLINDER PIC 9(4) VALUE ZEROES.
+       01 WS-CYLINDER PIC 9(3) VALUE ZEROES.
        01 WS-PROCESSES OCCURS 0 TO 100 DEPENDING ON WS-NO-PROC.
          02 WS-PROC PIC 9(3) VALUE ZEROES.
        01 WS-PR PIC 9(3) VALUE ZEROES.
@@ -28,15 +28,18 @@
            DISPLAY "SCAN DISK ALGORITHM".
            DISPLAY "ENTER NUMBER OF CYLINDERS: " WITH NO ADVANCING.
            ACCEPT WS-CYLINDER.
+           SUBTRACT 1 FROM WS-CYLINDER.
            DISPLAY "ENTER NO. OF PROCESS: " WITH NO ADVANCING.
            ACCEPT WS-NO-PROC.
-           ADD 1 TO WS-NO-PROC.
+           ADD 3 TO WS-NO-PROC.
+           MOVE WS-CYLINDER TO WS-PROCESSES(WS-NO-PROC).
            DISPLAY "ENTER THE STARTING POINT: " WITH NO ADVANCING.
            ACCEPT WS-START.
            DISPLAY "ENTER PREVIOUS POSITION: " WITH NO ADVANCING.
            ACCEPT WS-PREV.
-           MOVE WS-START TO WS-PROCESSES(1).
-           PERFORM VARYING I FROM 2 BY 1 UNTIL I > WS-NO-PROC
+           MOVE ZERO TO WS-PROCESSES(1).
+           MOVE WS-START TO WS-PROCESSES(2).
+           PERFORM VARYING I FROM 3 BY 1 UNTIL I > WS-NO-PROC - 1
              DISPLAY "ENTER A PROCESS: " WITH NO ADVANCING
              ACCEPT WS-PR
              MOVE WS-PR TO WS-PROCESSES(I)
@@ -48,30 +51,58 @@
            ELSE
              PERFORM LOHI
            END-IF.
-
            STOP RUN.
        HILO.
-           MOVE WS-PROCESSES(WS-START-IDX) TO WS-P1S.
-           MOVE WS-PROCESSES(1) TO WS-P2S.
-           COMPUTE WS-HEAD-M = WS-P1S - WS-P2S.
-           DISPLAY "HEAD MOVEMENT: " WS-HEAD-M.
-           COMPUTE WS-THM = WS-THM + WS-HEAD-M.
-           MOVE WS-PROCESSES(WS-NO-PROC) TO WS-P1S.
-           COMPUTE WS-HEAD-M = WS-P1S - WS-P2S.
-           DISPLAY "HEAD MOVEMENT: " WS-HEAD-M.
-           COMPUTE WS-THM = WS-THM + WS-HEAD-M.
+           PERFORM VARYING I FROM WS-START-IDX BY -1 UNTIL I < 2
+             MOVE WS-PROCESSES(I) TO WS-P1S
+             MOVE WS-PROCESSES(I - 1) TO WS-P2S
+             COMPUTE WS-HEAD-M = WS-P1S - WS-P2S
+             DISPLAY "HEAD MOVEMENT: " WS-HEAD-M
+             COMPUTE WS-THM = WS-THM + WS-HEAD-M
+           END-PERFORM.
+           IF WS-START-IDX >= WS-NO-PROC THEN
+             EXIT
+           END-IF.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-NO-PROC - 1
+             IF I IS EQUAL TO 1 THEN
+               MOVE WS-PROCESSES(WS-START-IDX + 1) TO WS-P1S
+               MOVE WS-PROCESSES(I) TO WS-P2S
+               MOVE WS-START-IDX TO I
+             ELSE
+               MOVE WS-PROCESSES(I + 1) TO WS-P1S
+               MOVE WS-PROCESSES(I) TO WS-P2S
+             END-IF
+             COMPUTE WS-HEAD-M = WS-P1S - WS-P2S
+             DISPLAY "HEAD MOVEMENT: " WS-HEAD-M
+             COMPUTE WS-THM = WS-THM + WS-HEAD-M
+           END-PERFORM.
            DISPLAY "THM: " WS-THM.
            EXIT.
        LOHI.
-           MOVE WS-PROCESSES(WS-START-IDX) TO WS-P1S.
-           MOVE WS-CYLINDER TO WS-P2S.
-           COMPUTE WS-HEAD-M = WS-P2S - WS-P1S.
-           DISPLAY "HEAD MOVEMENT: " WS-HEAD-M.
-           COMPUTE WS-THM = WS-THM + WS-HEAD-M.
-           MOVE WS-PROCESSES(1) TO WS-P1S.
-           COMPUTE WS-HEAD-M = WS-P2S - WS-P1S.
-           DISPLAY "HEAD MOVEMENT: " WS-HEAD-M.
-           COMPUTE WS-THM = WS-THM + WS-HEAD-M.
+           PERFORM VARYING I FROM WS-START-IDX BY 1 UNTIL I >=
+           WS-NO-PROC
+             MOVE WS-PROCESSES(I + 1) TO WS-P1S
+             MOVE WS-PROCESSES(I) TO WS-P2S
+             COMPUTE WS-HEAD-M = WS-P1S - WS-P2S
+             DISPLAY "HEAD MOVEMENT: " WS-HEAD-M
+             COMPUTE WS-THM = WS-THM + WS-HEAD-M
+           END-PERFORM.
+           IF WS-START-IDX <= 1 THEN
+             EXIT
+           END-IF.
+           PERFORM VARYING I FROM WS-NO-PROC BY -1 UNTIL I <= 2
+             IF I IS EQUAL TO WS-NO-PROC THEN
+               MOVE WS-PROCESSES(I) TO WS-P1S
+               MOVE WS-PROCESSES(WS-START-IDX - 1) TO WS-P2S
+               MOVE WS-START-IDX TO I
+             ELSE
+               MOVE WS-PROCESSES(I) TO WS-P1S
+               MOVE WS-PROCESSES(I - 1) TO WS-P2S
+             END-IF
+             COMPUTE WS-HEAD-M = WS-P1S - WS-P2S
+             DISPLAY "HEAD MOVEMENT: " WS-HEAD-M
+             COMPUTE WS-THM = WS-THM + WS-HEAD-M
+           END-PERFORM.
            DISPLAY "THM: " WS-THM.
            EXIT.
        BUBBLE-SORT.
@@ -83,6 +114,11 @@
                  MOVE TEMP TO WS-PROCESSES(J + 1)
                END-IF
              END-PERFORM
+           END-PERFORM.
+           EXIT.
+       DISP.
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > WS-NO-PROC
+             DISPLAY "ARR AT: " I " IS " WS-PROCESSES(I)
            END-PERFORM.
            EXIT.
        FIND-START.
